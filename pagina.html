@@ -1,0 +1,58 @@
+<!DOCTYPE html> 
+<html> 
+<head>
+<meta name="viewport" content="width=device-width, minimumscale=1.0, maximum-scale=1.0, initial-scale=1" />
+<style> 
+	body {text-align: center; max-width: 400px; margin: 10px auto;} 
+	#updateView { max-width: 400px; display: none; margin-top: 30px; } 
+	#dataVals { max-width: 400px; display: block; margin-top: 30px; } 
+	.convertButton { clear: both; position:relative; margin-top: 30px; -moz-box-shadow: 0px 1px 0px 0px #fff6af; -webkit-box-shadow: 0px 1px 0px 0px #fff6af; box-shadow: 0px 1px 0px 0px #fff6af; background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ffec64), color-stop(1, #ffab23)); background:-moz-linear-gradient(top, #ffec64 5%, #ffab23 100%); background:-webkit-linear-gradient(top, #ffec64 5%, #ffab23 100%); background:-o-linear-gradient(top, #ffec64 5%, #ffab23 100%); background:-ms-linear-gradient(top, #ffec64 5%, #ffab23 100%); background:linear-gradient(to bottom, #ffec64 5%, #ffab23 100%); filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffec64', endColorstr='#ffab23',GradientType=0); background-color:#ffec64; -moz-border-radius:6px; -webkit-border-radius:6px; border-radius:6px; border:1px solid #ffaa22; display:inline-block; cursor:pointer; color:#333333; font-family:Arial; font-size:21px; padding:14px 69px; text-decoration:none; text-shadow:0px 1px 0px #ffee66; } 
+	.convertButton:hover { background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ffab23), color-stop(1, #ffec64)); background:-moz-linear-gradient(top, #ffab23 5%, #ffec64 100%); background:-webkit-linear-gradient(top, #ffab23 5%, #ffec64 100%); background:-o-linear-gradient(top, #ffab23 5%, #ffec64 100%); background:-ms-linear-gradient(top, #ffab23 5%, #ffec64 100%); background:linear-gradient(to bottom, #ffab23 5%, #ffec64 100%); filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffab23', endColorstr='#ffec64',GradientType=0); background-color:#ffab23; } 
+	.convertButton:active { position:relative; top:1px; }
+</style>
+</head> 
+<body> 
+<a onClick="changeView()" class="convertButton" id="viewButton">Update Rate</a> 
+<div id="dataVals"> <h1>Light Level</h1> 
+<div id="light">@</div>
+<h1>Count Number</h1>
+<div id="countNum">@</div> </div> 
+
+<div id="updateView"> 
+<label for="fader">Update rate in Milliseconds</label><br /> 
+<input type="range" style="width: 300px" min="200" max="5000" value="2000" id="fader" step="1" oninput="outputUpdate(value)"> <output for="fader" id="#slide">2000</output></div> 
+
+<script> 
+	var changed = false; 
+	function changeView(){ 
+		if(changed == false){ 
+			document.getElementById('updateView').style.display = 'block'; document.getElementById('dataVals').style.display = 'none'; document.getElementById('viewButton').innerHTML = "Show Data"; changed = true; 
+		} 
+		else
+		{ 
+			document.getElementById('updateView').style.display = 'none'; document.getElementById('dataVals').style.display = 'block'; document.getElementById('viewButton').innerHTML = "Update Rate"; changed = false; 
+		} 
+	} 
+	
+	function loadDoc() { 
+		var xhttp = new XMLHttpRequest(); xhttp.onreadystatechange = function() { 
+			if (this.readyState == 4 && this.status == 200) { 
+				var obj = JSON.parse(this.responseText); 
+				document.getElementById("light").innerHTML = obj.data[0].dataValue; 
+				document.getElementById("countNum").innerHTML = obj.data[1].dataValue; 
+			} 
+		}; 
+		
+		xhttp.open("GET", "/data", true); xhttp.send(); 
+	} 
+	
+	var timedEvent = setInterval(function(){ loadDoc(); }, 2000); 
+	
+	function outputUpdate(vol) { 
+		clearInterval(timedEvent); timedEvent = setInterval(function(){ loadDoc(); }, vol); 
+		document.querySelector('#slide').value = vol; 
+	} 
+	</script> 
+	</body> 
+	</html>
+
